@@ -4,9 +4,7 @@
         "commonjs": true,
         "es2021": true
     },
-    "extends": "google",
-    "overrides": [
-    ],
+    "extends": "standard",
     "parserOptions": {
         "ecmaVersion": "latest"
     },
