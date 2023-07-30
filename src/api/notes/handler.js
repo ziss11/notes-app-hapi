@@ -1,3 +1,4 @@
+const autobind = require('auto-bind')
 const ClientError = require('../../exceptions/ClientError')
 
 class NotesHandler {
@@ -5,11 +6,7 @@ class NotesHandler {
     this._service = service
     this._validator = validator
 
-    this.postNoteHandler = this.postNoteHandler.bind(this)
-    this.getNotesHandler = this.getNotesHandler.bind(this)
-    this.getNoteByIdHandler = this.getNoteByIdHandler.bind(this)
-    this.putNoteByIdHandler = this.putNoteByIdHandler.bind(this)
-    this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this)
+    autobind(this)
   }
 
   async postNoteHandler (request, h) {
@@ -21,9 +18,7 @@ class NotesHandler {
       const response = h.response({
         status: 'success',
         message: 'Catatan berhasil ditambahkan',
-        data: {
-          noteId
-        }
+        data: { noteId }
       })
 
       response.code(201)
@@ -53,9 +48,7 @@ class NotesHandler {
     const notes = await this._service.getNotes()
     const response = h.response({
       status: 'success',
-      data: {
-        notes
-      }
+      data: { notes }
     })
     return response
   }
@@ -67,9 +60,7 @@ class NotesHandler {
 
       return h.response({
         status: 'success',
-        data: {
-          note
-        }
+        data: { note }
       })
     } catch (error) {
       if (error instanceof ClientError) {
