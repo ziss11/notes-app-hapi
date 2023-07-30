@@ -1,4 +1,4 @@
-const autobind = require('auto-bind')
+const autoBind = require('auto-bind')
 const ClientError = require('../../exceptions/ClientError')
 
 class UsersHandler {
@@ -6,7 +6,7 @@ class UsersHandler {
     this._service = service
     this._validator = validator
 
-    autobind(this)
+    autoBind(this)
   }
 
   async postUserHandler (request, h) {
