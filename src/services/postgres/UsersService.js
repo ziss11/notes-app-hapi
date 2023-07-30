@@ -54,7 +54,7 @@ class UsersService {
       throw new NotFoundError('User tidak ditemukan')
     }
 
-    return result.rows[0].id
+    return result.rows[0]
   }
 }
 
