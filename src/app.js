@@ -16,8 +16,13 @@ const notes = require('./api/notes')
 const NotesService = require('./services/postgres/NotesService')
 const NotesValidator = require('./validator/notes')
 
+const collaborations = require('./api/collaborations')
+const CollaborationsService = require('./services/postgres/CollaborationsService')
+const CollaborationsValidator = require('./validator/collaborations')
+
 const init = async () => {
-  const notesService = new NotesService()
+  const collaborationsService = new CollaborationsService()
+  const notesService = new NotesService(collaborationsService)
   const usersService = new UsersService()
   const authenticationsService = new AuthenticationsService()
 
@@ -70,6 +75,10 @@ const init = async () => {
     {
       plugin: notes,
       options: { service: notesService, validator: NotesValidator }
+    },
+    {
+      plugin: collaborations,
+      options: { collaborationsService, notesService, validator: CollaborationsValidator }
     }
   ])
 

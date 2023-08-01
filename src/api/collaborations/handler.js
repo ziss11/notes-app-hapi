@@ -1,29 +1,32 @@
 const autoBind = require('auto-bind')
 const ClientError = require('../../exceptions/ClientError')
 
-class UsersHandler {
-  constructor (service, validator) {
-    this._service = service
+class CollaborationsHandler {
+  constructor (collaborationsService, notesService, validator) {
+    this._collaborationsService = collaborationsService
+    this._notesService = notesService
     this._validator = validator
 
     autoBind(this)
   }
 
-  async postUserHandler (request, h) {
+  async postCollaborationHandler (request, h) {
     try {
-      this._validator.validateUserPayload(request.payload)
+      this._validator.validateCollaborationPayload(request.payload)
+      const { noteId, userId } = request.payload
+      const { id: credentialId } = request.auth.credentials
 
-      const userId = await this._service.addUser(request.payload)
+      await this._notesService.verifyNoteOwner(noteId, credentialId)
+      const collaborationId = await this._collaborationsService.addCollaboration(noteId, userId)
+
       const response = h.response({
         status: 'success',
-        message: 'User berhasil ditambahkan',
-        data: { userId }
+        message: 'Kolaborasi berhasil ditambahkan',
+        data: { collaborationId }
       })
-
       response.code(201)
       return response
     } catch (error) {
-      console.log(error.message)
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
@@ -44,44 +47,18 @@ class UsersHandler {
     }
   }
 
-  async getUserByIdHandler (request, h) {
+  async deleteCollaborationHandler (request, h) {
     try {
-      const { id } = request.params
-      const user = await this._service.getUserById(id)
+      this._validator.validateCollaborationPayload(request.payload)
+      const { noteId, userId } = request.payload
+      const { id: credentialId } = request.auth.credentials
+
+      await this._notesService.verifyNoteOwner(noteId, credentialId)
+      await this._collaborationsService.deleteCollaboration(noteId, userId)
 
       return h.response({
         status: 'success',
-        data: { user }
-      })
-    } catch (error) {
-      if (error instanceof ClientError) {
-        const response = h.response({
-          status: 'fail',
-          message: error.message
-        })
-        response.code(error.statusCode)
-        return response
-      }
-
-      const response = h.response({
-        status: 'error',
-        message: 'Maaf terjadi kegagalan pada server kami'
-      })
-
-      response.code(500)
-      console.log(error.message)
-      return response
-    }
-  }
-
-  async getUserByUsernameHandler (request, h) {
-    try {
-      const { username = '' } = request.query
-      const users = await this._service.getUserByUsername(username)
-
-      return h.response({
-        status: 'success',
-        data: { users }
+        message: 'Kolaborasi berhasil dihapus'
       })
     } catch (error) {
       if (error instanceof ClientError) {
@@ -105,4 +82,4 @@ class UsersHandler {
   }
 }
 
-module.exports = UsersHandler
+module.exports = CollaborationsHandler

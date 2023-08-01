@@ -32,6 +32,7 @@ class AuthenticationsHandler {
       response.code(201)
       return response
     } catch (error) {
+      console.log(error.message)
       if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
