@@ -1,7 +1,7 @@
 module.exports = (handler) => [
   {
     method: 'POST',
-    path: '/exports/notes',
+    path: '/export/notes',
     handler: handler.postExportNotesHandler,
     options: {
       auth: 'notesapp_jwt'
