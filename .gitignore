@@ -4,3 +4,5 @@
 *.postman_collection.json
 *.postman_environment.json
 *.env
+
+src/api/uploads/file
