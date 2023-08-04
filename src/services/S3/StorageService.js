@@ -1,26 +1,27 @@
-const AWS = require('aws-sdk')
+const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3')
 
 class StorageService {
   constructor () {
-    this._S3 = new AWS.S3()
+    this._S3 = new S3Client()
   }
 
-  writeFile (file, meta) {
-    const parameter = {
+  async writeFile (file, meta) {
+    const key = +new Date() + meta.filename
+
+    const parameter = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: +new Date() + meta.filename,
+      Key: key,
       Body: file._data,
       ContentType: meta.headers['content-type']
-    }
-
-    return new Promise((resolve, reject) => {
-      this._S3.upload(parameter, (error, data) => {
-        if (error) {
-          return reject(error)
-        }
-        return resolve(data.Location)
-      })
     })
+
+    await this._S3.send(parameter)
+
+    const bucketName = process.env.AWS_BUCKET_NAME
+    const region = process.env.AWS_REGION
+    const fileLocation = `https://${bucketName}.s3.${region}.amazonaws.com/${key}`
+
+    return fileLocation
   }
 }
 
